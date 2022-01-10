@@ -253,7 +253,7 @@ public class TopicTransactionBuffer extends TopicTransactionBufferState implemen
 
 
     @Override
-    public CompletableFuture<Position> appendBufferToTxn(TxnID txnId, long sequenceId, ByteBuf buffer) {
+    public CompletableFuture<Position> appendBufferToTxn(TxnID txnId, long sequenceId, ByteBuf buffer, Object context) {
         CompletableFuture<Position> completableFuture = new CompletableFuture<>();
         Long lowWaterMark = lowWaterMarks.get(txnId.getMostSigBits());
         if (lowWaterMark != null && lowWaterMark >= txnId.getLeastSigBits()) {
@@ -276,7 +276,7 @@ public class TopicTransactionBuffer extends TopicTransactionBufferState implemen
                 log.error("Failed to append buffer to txn {}", txnId, exception);
                 completableFuture.completeExceptionally(exception);
             }
-        }, null);
+        }, context);
         return completableFuture;
     }
 
