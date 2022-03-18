@@ -1211,16 +1211,16 @@ public class Commands {
         return serializeWithSize(cmd);
     }
 
-    public static ByteBuf newTxnResponse(long requestId, long txnIdLeastBits, long txnIdMostBits) {
+    public static BaseCommand newTxnResponse(long requestId, long txnIdLeastBits, long txnIdMostBits) {
         BaseCommand cmd = localCmd(Type.NEW_TXN_RESPONSE);
         cmd.setNewTxnResponse()
                 .setRequestId(requestId)
                 .setTxnidMostBits(txnIdMostBits)
                 .setTxnidLeastBits(txnIdLeastBits);
-        return serializeWithSize(cmd);
+        return cmd;
     }
 
-    public static ByteBuf newTxnResponse(long requestId, long txnIdMostBits, ServerError error, String errorMsg) {
+    public static BaseCommand newTxnResponse(long requestId, long txnIdMostBits, ServerError error, String errorMsg) {
         BaseCommand cmd = localCmd(Type.NEW_TXN_RESPONSE);
         CommandNewTxnResponse response = cmd.setNewTxnResponse()
                 .setRequestId(requestId)
@@ -1229,7 +1229,7 @@ public class Commands {
         if (errorMsg != null) {
             response.setMessage(errorMsg);
         }
-        return serializeWithSize(cmd);
+        return cmd;
     }
 
     public static ByteBuf newAddPartitionToTxn(long requestId, long txnIdLeastBits, long txnIdMostBits,
@@ -1310,16 +1310,17 @@ public class Commands {
         return cmd;
     }
 
-    public static ByteBuf newEndTxnResponse(long requestId, long txnIdLeastBits, long txnIdMostBits) {
+    public static BaseCommand newEndTxnResponse(long requestId, long txnIdLeastBits, long txnIdMostBits) {
         BaseCommand cmd = localCmd(Type.END_TXN_RESPONSE);
         cmd.setEndTxnResponse()
                 .setRequestId(requestId)
                 .setTxnidLeastBits(txnIdLeastBits)
                 .setTxnidMostBits(txnIdMostBits);
-        return serializeWithSize(cmd);
+        return cmd;
     }
 
-    public static ByteBuf newEndTxnResponse(long requestId, long txnIdMostBits, ServerError error, String errorMsg) {
+    public static BaseCommand newEndTxnResponse(long requestId, long txnIdMostBits,
+                                                ServerError error, String errorMsg) {
         BaseCommand cmd = localCmd(Type.END_TXN_RESPONSE);
         CommandEndTxnResponse response = cmd.setEndTxnResponse()
                 .setRequestId(requestId)
@@ -1328,7 +1329,7 @@ public class Commands {
         if (errorMsg != null) {
             response.setMessage(errorMsg);
         }
-        return serializeWithSize(cmd);
+        return cmd;
     }
 
     public static ByteBuf newEndTxnOnPartition(long requestId, long txnIdLeastBits, long txnIdMostBits, String topic,

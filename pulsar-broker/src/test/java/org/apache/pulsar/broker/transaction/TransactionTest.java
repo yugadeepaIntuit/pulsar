@@ -69,14 +69,8 @@ import org.apache.bookkeeper.mledger.impl.ManagedLedgerFactoryImpl;
 import org.apache.bookkeeper.mledger.impl.ManagedLedgerImpl;
 import org.apache.bookkeeper.mledger.impl.PositionImpl;
 import org.apache.pulsar.broker.PulsarService;
-import org.apache.pulsar.broker.ServiceConfiguration;
 import org.apache.pulsar.broker.intercept.BrokerInterceptor;
 import org.apache.pulsar.broker.intercept.CounterBrokerInterceptor;
-import org.apache.pulsar.broker.resources.NamespaceResources;
-import org.apache.pulsar.broker.resources.PulsarResources;
-import org.apache.pulsar.broker.service.BacklogQuotaManager;
-import org.apache.pulsar.broker.service.BrokerService;
-import org.apache.pulsar.broker.service.BrokerServiceException;
 import org.apache.pulsar.broker.service.Topic;
 import org.apache.pulsar.broker.service.TransactionBufferSnapshotService;
 import org.apache.pulsar.broker.service.persistent.PersistentSubscription;
@@ -773,8 +767,12 @@ public class TransactionTest extends TransactionTestBase {
         field.set(commitTxn, TransactionImpl.State.COMMITTING);
         field.set(abortTxn, TransactionImpl.State.ABORTING);
 
-        abortTxn.abort();
-        commitTxn.commit();
+        BrokerInterceptor listener = getPulsarServiceList().get(0).getBrokerInterceptor();
+        assertEquals(((CounterBrokerInterceptor)listener).getTxnCount(),2);
+        abortTxn.abort().get();
+        assertEquals(((CounterBrokerInterceptor)listener).getAbortedTxnCount(),1);
+        commitTxn.commit().get();
+        assertEquals(((CounterBrokerInterceptor)listener).getCommittedTxnCount(),1);
     }
 
     @Test
